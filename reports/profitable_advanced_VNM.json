@@ -1,0 +1,17 @@
+{
+  "strategy": "advanced",
+  "symbol": "VNM",
+  "in_sample": {
+    "return": 0.0,
+    "sharpe": 0,
+    "drawdown": 0,
+    "trades": 1
+  },
+  "out_of_sample": {
+    "return": 0.0,
+    "sharpe": 0,
+    "drawdown": 0,
+    "trades": 1
+  },
+  "passed_criteria": false
+}

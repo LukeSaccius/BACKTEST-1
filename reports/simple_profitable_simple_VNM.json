@@ -1,0 +1,17 @@
+{
+  "strategy": "simple",
+  "symbol": "VNM",
+  "in_sample": {
+    "return": 0.9643510372505116,
+    "sharpe": -0.036995598718209594,
+    "drawdown": 23.77437115031293,
+    "trades": 1
+  },
+  "out_of_sample": {
+    "return": 1.5734232078170751,
+    "sharpe": -0.27111383006402917,
+    "drawdown": 3.8082502852031084,
+    "trades": 1
+  },
+  "passed_criteria": false
+}
