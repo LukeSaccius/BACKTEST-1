@@ -1,0 +1,56 @@
+{
+  "strategy": "rsi",
+  "symbol": "VNM",
+  "parameters": {
+    "rsi_period": 14,
+    "rsi_oversold": 30,
+    "rsi_overbought": 70,
+    "rsi_exit": 50
+  },
+  "in_sample": {
+    "metrics": {
+      "total_return": 0.03492490143464238,
+      "annual_return": 0.002148347938934282,
+      "sharpe_ratio": -232.1168736872496,
+      "max_drawdown": 0.018282261036503846,
+      "total_trades": 8,
+      "win_rate": 67.85714285714286,
+      "profit_factor": 0,
+      "turnover": 0,
+      "time_in_market": 0,
+      "fitness": -19.17075983923071,
+      "daily_return": 8.526587264316987e-06
+    },
+    "passed": false,
+    "failed_criteria": [
+      "Daily Return > 0.0004",
+      "Sharpe Ratio > 1.0",
+      "Fitness > 2.1"
+    ]
+  },
+  "out_of_sample": {
+    "metrics": {
+      "total_return": 0.0011599721603415675,
+      "annual_return": 0.000585795882202219,
+      "sharpe_ratio": -421.1451838391326,
+      "max_drawdown": 0.00711311358621274,
+      "total_trades": 8,
+      "win_rate": 66.66666666666666,
+      "profit_factor": 0,
+      "turnover": 0,
+      "time_in_market": 0,
+      "fitness": -18.16144259353194,
+      "daily_return": 2.324593507698532e-06
+    },
+    "passed": false,
+    "failed_criteria": [
+      "Daily Return > 0.0004",
+      "Sharpe Ratio > 0.7",
+      "Fitness > 2.1"
+    ]
+  },
+  "robustness": {
+    "passed": false
+  },
+  "overall_passed": false
+}

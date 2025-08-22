@@ -1,0 +1,56 @@
+{
+  "strategy": "sma",
+  "symbol": "VNM",
+  "parameters": {
+    "fast_period": 10,
+    "slow_period": 30
+  },
+  "in_sample": {
+    "metrics": {
+      "total_return": 0.03936614603476483,
+      "annual_return": 0.0024214933555933124,
+      "sharpe_ratio": -68.69103459019108,
+      "max_drawdown": 0.056673626076754496,
+      "total_trades": 8,
+      "win_rate": 42.64705882352941,
+      "profit_factor": 0,
+      "turnover": 0,
+      "time_in_market": 0,
+      "fitness": -6.023189494926901,
+      "daily_return": 9.610875496768757e-06
+    },
+    "passed": false,
+    "failed_criteria": [
+      "Daily Return > 0.0004",
+      "Sharpe Ratio > 1.0",
+      "Fitness > 2.1",
+      "Win Rate > 50%"
+    ]
+  },
+  "out_of_sample": {
+    "metrics": {
+      "total_return": -0.013103083190901088,
+      "annual_return": -0.006617402910776361,
+      "sharpe_ratio": -464.80430494913253,
+      "max_drawdown": 0.015722757450163598,
+      "total_trades": 8,
+      "win_rate": 22.22222222222222,
+      "profit_factor": 0,
+      "turnover": 0,
+      "time_in_market": 0,
+      "fitness": -67.36768313349802,
+      "daily_return": -2.6258683749300778e-05
+    },
+    "passed": false,
+    "failed_criteria": [
+      "Daily Return > 0.0004",
+      "Sharpe Ratio > 0.7",
+      "Fitness > 2.1",
+      "Win Rate > 50%"
+    ]
+  },
+  "robustness": {
+    "passed": false
+  },
+  "overall_passed": false
+}

@@ -35,16 +35,17 @@
     "symbol": "VNM"
   },
   "IS": {
-    "annual_return_pct": 2.8745304019723652e+20,
-    "avg_daily_return": -3.1954363891094397,
-    "sharpe": -0.31489247617058075,
+    "annual_return_pct": -93.08931543563254,
+    "avg_daily_return": 0.005075826761414694,
+    "sharpe": 0.46933283291557526,
     "win_rate_pct": 50.0,
-    "profit_factor": 0.22280776075900255,
-    "max_drawdown_pct": 13901484.145944536,
+    "profit_factor": 1.0975533053762203,
+    "max_drawdown_pct": 99.02873520469127,
     "turnover_per_day": 0.00034246575342465754,
     "time_in_market_pct": 82.00899550224888,
-    "fitness": -15.92107417863427,
-    "n_daily_points": 2920
+    "fitness": 0.9457564810620218,
+    "n_daily_points": 1238,
+    "n_trades": 1
   },
   "OOS": {
     "annual_return_pct": 0.0,
@@ -56,13 +57,14 @@
     "turnover_per_day": 0.0,
     "time_in_market_pct": 0.0,
     "fitness": NaN,
-    "n_daily_points": 366
+    "n_daily_points": 250,
+    "n_trades": 0
   },
   "pass_criteria": {
     "sharpe": false,
     "drawdown": true,
     "turnover": false,
     "fitness": false,
-    "daily_return": "False"
+    "daily_return": false
   }
 }
