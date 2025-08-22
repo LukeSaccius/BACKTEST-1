@@ -1,0 +1,69 @@
+{
+  "data_quality": {
+    "report": {
+      "empty": false,
+      "n_rows": 4595,
+      "n_dupes": 0,
+      "n_nans": 0,
+      "n_outliers": 0,
+      "dates_monotonic": true,
+      "n_day_gaps": 2141,
+      "start": "2006-01-19T00:00:00",
+      "end": "2024-06-28T00:00:00",
+      "n_days": 6735
+    },
+    "warnings": []
+  },
+  "strategy": "rsi",
+  "params": {
+    "strategy": "rsi",
+    "rsi_period": 14,
+    "rsi_lower": 30,
+    "rsi_upper": 70,
+    "rsi_exit": 50,
+    "sma_trend": 200,
+    "use_trend_filter": true,
+    "atr_period": 14,
+    "stop_atr": 0.0,
+    "take_atr": 0.0,
+    "min_hold": 0,
+    "cash": 1000000.0,
+    "commission": 0.0005,
+    "slippage_bps": 0.0,
+    "sizer_perc": 0.95,
+    "tf": "days",
+    "symbol": "VNM"
+  },
+  "IS": {
+    "annual_return_pct": 2.8745304019723652e+20,
+    "avg_daily_return": -3.1954363891094397,
+    "sharpe": -0.31489247617058075,
+    "win_rate_pct": 50.0,
+    "profit_factor": 0.22280776075900255,
+    "max_drawdown_pct": 13901484.145944536,
+    "turnover_per_day": 0.00034246575342465754,
+    "time_in_market_pct": 82.00899550224888,
+    "fitness": -15.92107417863427,
+    "n_daily_points": 2920
+  },
+  "OOS": {
+    "annual_return_pct": 0.0,
+    "avg_daily_return": 0.0,
+    "sharpe": NaN,
+    "win_rate_pct": NaN,
+    "profit_factor": NaN,
+    "max_drawdown_pct": 0.0,
+    "turnover_per_day": 0.0,
+    "time_in_market_pct": 0.0,
+    "fitness": NaN,
+    "n_daily_points": 366
+  },
+  "pass_criteria": {
+    "sharpe": false,
+    "drawdown": true,
+    "turnover": false,
+    "fitness": false,
+    "daily_return": "False"
+  },
+  "grid_search": []
+}

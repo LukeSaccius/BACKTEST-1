@@ -1,0 +1,58 @@
+{
+  "data_quality": {
+    "report": {
+      "empty": false,
+      "n_rows": 4385,
+      "n_dupes": 0,
+      "n_nans": 0,
+      "n_outliers": 0,
+      "dates_monotonic": true,
+      "n_day_gaps": 2045,
+      "start": "2006-11-21T00:00:00",
+      "end": "2024-06-28T00:00:00",
+      "n_days": 6429
+    },
+    "warnings": []
+  },
+  "params": {
+    "fast": 10,
+    "slow": 30,
+    "cash": 1000000.0,
+    "commission": 0.001,
+    "slippage_bps": 0.0,
+    "sizer_perc": 0.95,
+    "tf": "days",
+    "symbol": "ACB"
+  },
+  "IS": {
+    "annual_return_pct": 2.008099888595183e-05,
+    "avg_daily_return": 7.968749995484796e-10,
+    "sharpe": 0.08924052314085322,
+    "win_rate_pct": 43.58974358974359,
+    "profit_factor": 1.029366073738438,
+    "max_drawdown_pct": 0.0011382853254075943,
+    "turnover_per_day": 0.013013698630136987,
+    "time_in_market_pct": 57.207207207207205,
+    "fitness": 2.2082937122222547e-05,
+    "n_daily_points": 2920
+  },
+  "OOS": {
+    "annual_return_pct": 8.324766256340155e-05,
+    "avg_daily_return": 3.3034930816963367e-09,
+    "sharpe": 0.2948099370050044,
+    "win_rate_pct": 33.333333333333336,
+    "profit_factor": 1.088242493951506,
+    "max_drawdown_pct": 0.0002444191780251734,
+    "turnover_per_day": 0.01639344262295082,
+    "time_in_market_pct": 52.191235059760956,
+    "fitness": 0.00013234079410850885,
+    "n_daily_points": 366
+  },
+  "pass_criteria": {
+    "sharpe": false,
+    "drawdown": true,
+    "turnover": true,
+    "fitness": false,
+    "daily_return": "False"
+  }
+}

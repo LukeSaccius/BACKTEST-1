@@ -1,0 +1,58 @@
+{
+  "data_quality": {
+    "report": {
+      "empty": false,
+      "n_rows": 4181,
+      "n_dupes": 0,
+      "n_nans": 0,
+      "n_outliers": 0,
+      "dates_monotonic": true,
+      "n_day_gaps": 1947,
+      "start": "2007-09-19T00:00:00",
+      "end": "2024-06-28T00:00:00",
+      "n_days": 6127
+    },
+    "warnings": []
+  },
+  "params": {
+    "fast": 10,
+    "slow": 30,
+    "cash": 1000000.0,
+    "commission": 0.001,
+    "slippage_bps": 0.0,
+    "sizer_perc": 0.95,
+    "tf": "days",
+    "symbol": "VIC"
+  },
+  "IS": {
+    "annual_return_pct": 0.00039405529859148913,
+    "avg_daily_return": 1.5637406610338603e-08,
+    "sharpe": 0.30914509973867205,
+    "win_rate_pct": 43.24324324324324,
+    "profit_factor": NaN,
+    "max_drawdown_pct": 0.0040513488555415774,
+    "turnover_per_day": 0.012328767123287671,
+    "time_in_market_pct": 49.72513743128436,
+    "fitness": 0.00034816483653806666,
+    "n_daily_points": 2921
+  },
+  "OOS": {
+    "annual_return_pct": -0.0008862692600031252,
+    "avg_daily_return": -3.5169506980916574e-08,
+    "sharpe": -1.5665720747333534,
+    "win_rate_pct": 0.0,
+    "profit_factor": NaN,
+    "max_drawdown_pct": 0.0013813046184484848,
+    "turnover_per_day": 0.01092896174863388,
+    "time_in_market_pct": 35.45816733067729,
+    "fitness": -0.002810244249653783,
+    "n_daily_points": 367
+  },
+  "pass_criteria": {
+    "sharpe": false,
+    "drawdown": true,
+    "turnover": true,
+    "fitness": false,
+    "daily_return": "False"
+  }
+}

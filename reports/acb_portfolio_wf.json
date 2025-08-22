@@ -1,0 +1,321 @@
+{
+  "data_quality": {
+    "report": {
+      "empty": false,
+      "n_rows": 4385,
+      "n_dupes": 0,
+      "n_nans": 0,
+      "n_outliers": 0,
+      "dates_monotonic": true,
+      "n_day_gaps": 2045,
+      "start": "2006-11-21T00:00:00",
+      "end": "2024-06-28T00:00:00",
+      "n_days": 6429
+    },
+    "warnings": []
+  },
+  "params": {
+    "fast": 10,
+    "slow": 30,
+    "cash": 1000000.0,
+    "commission": 0.001,
+    "slippage_bps": 0.0,
+    "sizer_perc": 0.95,
+    "tf": "days",
+    "symbol": "ACB"
+  },
+  "IS": {
+    "annual_return_pct": 2.008099888595183e-05,
+    "avg_daily_return": 7.968749995484796e-10,
+    "sharpe": 0.08924052314085322,
+    "win_rate_pct": 43.58974358974359,
+    "profit_factor": 1.029366073738438,
+    "max_drawdown_pct": 0.0011382853254075943,
+    "turnover_per_day": 0.013013698630136987,
+    "time_in_market_pct": 57.207207207207205,
+    "fitness": 2.2082937122222547e-05,
+    "n_daily_points": 2920
+  },
+  "OOS": {
+    "annual_return_pct": 8.324766256340155e-05,
+    "avg_daily_return": 3.3034930816963367e-09,
+    "sharpe": 0.2948099370050044,
+    "win_rate_pct": 33.333333333333336,
+    "profit_factor": 1.088242493951506,
+    "max_drawdown_pct": 0.0002444191780251734,
+    "turnover_per_day": 0.01639344262295082,
+    "time_in_market_pct": 52.191235059760956,
+    "fitness": 0.00013234079410850885,
+    "n_daily_points": 366
+  },
+  "pass_criteria": {
+    "sharpe": false,
+    "drawdown": true,
+    "turnover": true,
+    "fitness": false,
+    "daily_return": "False"
+  },
+  "walkforward": [
+    {
+      "start": "2006-11-21",
+      "is_end": "2014-11-21",
+      "oos_end": "2015-11-21",
+      "is": {
+        "annual_return_pct": 4.2185438764441585e-05,
+        "avg_daily_return": 1.6740269154903856e-09,
+        "sharpe": 0.42874258555144407,
+        "win_rate_pct": 31.03448275862069,
+        "profit_factor": 1.2015401911034735,
+        "max_drawdown_pct": 0.00027793877859498924,
+        "turnover_per_day": 0.009585758301951387,
+        "time_in_market_pct": 38.15261044176707,
+        "fitness": 0.00017916971533544278,
+        "n_daily_points": 2921
+      },
+      "oos": {
+        "annual_return_pct": 7.623455109406763e-05,
+        "avg_daily_return": 3.0251802570051103e-09,
+        "sharpe": 1.1952037271566769,
+        "win_rate_pct": 66.66666666666667,
+        "profit_factor": 1.4761249488657866,
+        "max_drawdown_pct": 4.592031415283369e-05,
+        "turnover_per_day": 0.008241758241758242,
+        "time_in_market_pct": 47.17741935483871,
+        "fitness": 0.0007241151467445174,
+        "n_daily_points": 362
+      }
+    },
+    {
+      "start": "2007-11-21",
+      "is_end": "2015-11-21",
+      "oos_end": "2016-11-21",
+      "is": {
+        "annual_return_pct": 3.8883194375394226e-05,
+        "avg_daily_return": 1.542984915575709e-09,
+        "sharpe": 0.4782131949770954,
+        "win_rate_pct": 38.70967741935484,
+        "profit_factor": 1.1978814275834004,
+        "max_drawdown_pct": 0.00027793926334032854,
+        "turnover_per_day": 0.010612803834303321,
+        "time_in_market_pct": 42.64188849824209,
+        "fitness": 0.00018234225731111067,
+        "n_daily_points": 2921
+      },
+      "oos": {
+        "annual_return_pct": -1.0500756941755895e-05,
+        "avg_daily_return": -4.1669649110117865e-10,
+        "sharpe": -0.30614819441270336,
+        "win_rate_pct": 40.0,
+        "profit_factor": 0.893904594260392,
+        "max_drawdown_pct": 4.001963542098154e-05,
+        "turnover_per_day": 0.013850415512465374,
+        "time_in_market_pct": 38.4,
+        "fitness": -5.310191985244097e-05,
+        "n_daily_points": 361
+      }
+    },
+    {
+      "start": "2008-11-21",
+      "is_end": "2016-11-21",
+      "oos_end": "2017-11-21",
+      "is": {
+        "annual_return_pct": 2.6745402670336205e-05,
+        "avg_daily_return": 1.0613264169542468e-09,
+        "sharpe": 0.366718301109746,
+        "win_rate_pct": 38.23529411764706,
+        "profit_factor": 1.1523071953371784,
+        "max_drawdown_pct": 0.00027793961375010857,
+        "turnover_per_day": 0.011647824597464886,
+        "time_in_market_pct": 43.781344032096285,
+        "fitness": 0.00011069669638797872,
+        "n_daily_points": 2917
+      },
+      "oos": {
+        "annual_return_pct": 5.694178952797557e-05,
+        "avg_daily_return": 2.2595955802422048e-09,
+        "sharpe": 0.6769151797730224,
+        "win_rate_pct": 50.0,
+        "profit_factor": 1.2025175316870302,
+        "max_drawdown_pct": 7.27307174306609e-05,
+        "turnover_per_day": 0.008241758241758242,
+        "time_in_market_pct": 51.39442231075697,
+        "fitness": 0.0003544375092682651,
+        "n_daily_points": 364
+      }
+    },
+    {
+      "start": "2009-11-21",
+      "is_end": "2017-11-21",
+      "oos_end": "2018-11-21",
+      "is": {
+        "annual_return_pct": 3.0583047538890185e-05,
+        "avg_daily_return": 1.2136134965541405e-09,
+        "sharpe": 0.5206752934137984,
+        "win_rate_pct": 40.0,
+        "profit_factor": 1.2001187740017154,
+        "max_drawdown_pct": 0.00011115875345943046,
+        "turnover_per_day": 0.011647824597464886,
+        "time_in_market_pct": 45.937813440320966,
+        "fitness": 0.0001680678940339169,
+        "n_daily_points": 2919
+      },
+      "oos": {
+        "annual_return_pct": -4.1058827981999e-05,
+        "avg_daily_return": -1.6293172086237759e-09,
+        "sharpe": -0.44338198625938946,
+        "win_rate_pct": 0.0,
+        "profit_factor": 0.8033125167836818,
+        "max_drawdown_pct": 0.00010511610823128116,
+        "turnover_per_day": 0.005494505494505495,
+        "time_in_market_pct": 21.115537848605577,
+        "fitness": -0.0002414440797230942,
+        "n_daily_points": 364
+      }
+    },
+    {
+      "start": "2010-11-21",
+      "is_end": "2018-11-21",
+      "oos_end": "2019-11-21",
+      "is": {
+        "annual_return_pct": 4.280521914701296e-05,
+        "avg_daily_return": 1.6986213465097613e-09,
+        "sharpe": 0.4372481744313499,
+        "win_rate_pct": 45.45454545454545,
+        "profit_factor": 1.184470133534996,
+        "max_drawdown_pct": 0.0003951448958589981,
+        "turnover_per_day": 0.011301369863013699,
+        "time_in_market_pct": 50.25050100200401,
+        "fitness": 0.00016951602089102847,
+        "n_daily_points": 2920
+      },
+      "oos": {
+        "annual_return_pct": 3.211112342693667e-05,
+        "avg_daily_return": 1.2742519914690318e-09,
+        "sharpe": 0.4016973051522309,
+        "win_rate_pct": 25.0,
+        "profit_factor": 1.1244442675193163,
+        "max_drawdown_pct": 8.466367339785084e-05,
+        "turnover_per_day": 0.008241758241758242,
+        "time_in_market_pct": 45.381526104417674,
+        "fitness": 0.00015794891362779875,
+        "n_daily_points": 364
+      }
+    },
+    {
+      "start": "2011-11-21",
+      "is_end": "2019-11-21",
+      "oos_end": "2020-11-21",
+      "is": {
+        "annual_return_pct": 3.5506575613020175e-05,
+        "avg_daily_return": 1.4089928150004878e-09,
+        "sharpe": 0.356454263405768,
+        "win_rate_pct": 41.1764705882353,
+        "profit_factor": 1.1441910447768733,
+        "max_drawdown_pct": 0.00042781753458893224,
+        "turnover_per_day": 0.011297500855871277,
+        "time_in_market_pct": 49.57436154231347,
+        "fitness": 0.0001258829788314648,
+        "n_daily_points": 2921
+      },
+      "oos": {
+        "annual_return_pct": 0.0001840677859243911,
+        "avg_daily_return": 7.304279321415527e-09,
+        "sharpe": 0.8729125557376289,
+        "win_rate_pct": 25.0,
+        "profit_factor": 1.2664676428836799,
+        "max_drawdown_pct": 0.00018299706359008774,
+        "turnover_per_day": 0.00821917808219178,
+        "time_in_market_pct": 62.698412698412696,
+        "fitness": 0.0008228965309369044,
+        "n_daily_points": 365
+      }
+    },
+    {
+      "start": "2012-11-21",
+      "is_end": "2020-11-21",
+      "oos_end": "2021-11-21",
+      "is": {
+        "annual_return_pct": 6.12110252706799e-05,
+        "avg_daily_return": 2.4290112284138356e-09,
+        "sharpe": 0.4954145587476979,
+        "win_rate_pct": 45.45454545454545,
+        "profit_factor": 1.1920136471272436,
+        "max_drawdown_pct": 0.0004669213345462989,
+        "turnover_per_day": 0.010955152345087298,
+        "time_in_market_pct": 52.52879318978468,
+        "fitness": 0.0002332782859345816,
+        "n_daily_points": 2921
+      },
+      "oos": {
+        "annual_return_pct": 9.277455756961928e-05,
+        "avg_daily_return": 3.681556688930326e-09,
+        "sharpe": 0.24519050180952517,
+        "win_rate_pct": 50.0,
+        "profit_factor": 1.0756574073373788,
+        "max_drawdown_pct": 0.0006136382632970071,
+        "turnover_per_day": 0.008310249307479225,
+        "time_in_market_pct": 54.91803278688525,
+        "fitness": 0.00016319707183253755,
+        "n_daily_points": 361
+      }
+    },
+    {
+      "start": "2013-11-21",
+      "is_end": "2021-11-21",
+      "oos_end": "2022-11-21",
+      "is": {
+        "annual_return_pct": 6.595933164099677e-05,
+        "avg_daily_return": 2.617439906938922e-09,
+        "sharpe": 0.35184337263549953,
+        "win_rate_pct": 48.484848484848484,
+        "profit_factor": 1.1337262646737223,
+        "max_drawdown_pct": 0.0006136343888941907,
+        "turnover_per_day": 0.010958904109589041,
+        "time_in_market_pct": 54.618473895582326,
+        "fitness": 0.00017195078839001254,
+        "n_daily_points": 2920
+      },
+      "oos": {
+        "annual_return_pct": -0.00036498044763133564,
+        "avg_daily_return": -1.4483363518659502e-08,
+        "sharpe": -1.3768383203576822,
+        "win_rate_pct": 0.0,
+        "profit_factor": 0.6314695224312643,
+        "max_drawdown_pct": 0.0006528253475438622,
+        "turnover_per_day": 0.01662049861495845,
+        "time_in_market_pct": 38.15261044176707,
+        "fitness": -0.0012852737453963958,
+        "n_daily_points": 361
+      }
+    },
+    {
+      "start": "2014-11-21",
+      "is_end": "2022-11-21",
+      "oos_end": "2023-11-21",
+      "is": {
+        "annual_return_pct": 1.7307698696455986e-05,
+        "avg_daily_return": 6.868223318384551e-10,
+        "sharpe": 0.08148360194444063,
+        "win_rate_pct": 42.857142857142854,
+        "profit_factor": 1.0277411509371772,
+        "max_drawdown_pct": 0.001138284288035433,
+        "turnover_per_day": 0.011990407673860911,
+        "time_in_market_pct": 56.318956870611835,
+        "fitness": 1.9501833654348565e-05,
+        "n_daily_points": 2917
+      },
+      "oos": {
+        "annual_return_pct": -2.8672009999564096e-05,
+        "avg_daily_return": -1.1377670728639744e-09,
+        "sharpe": -0.12017814815862028,
+        "win_rate_pct": 37.5,
+        "profit_factor": 0.9653832560160326,
+        "max_drawdown_pct": 0.0003476745988063005,
+        "turnover_per_day": 0.019230769230769232,
+        "time_in_market_pct": 52.8,
+        "fitness": -2.9231685665916885e-05,
+        "n_daily_points": 364
+      }
+    }
+  ]
+}

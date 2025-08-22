@@ -1,0 +1,14 @@
+name: backtesting-lab
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pandas
+  - numpy
+  - matplotlib
+  - scipy
+  - pip
+  - pip:
+      - backtrader>=1.9.78.123
+      - quantstats>=0.0.62

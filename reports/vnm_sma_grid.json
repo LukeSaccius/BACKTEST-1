@@ -1,0 +1,74 @@
+{
+  "rank": 3,
+  "params": {
+    "fast": 5,
+    "slow": 20
+  },
+  "sharpe_is": 0.2839630934326231,
+  "sharpe_oos": -0.509852770251969,
+  "maxdd_oos": 0.0009551871741356118,
+  "fitness_oos": -0.0003750012030444395,
+  "trades": 0,
+  "turnover_oos": 0.02185792349726776,
+  "pass_sharpe": false,
+  "pass_dd": true,
+  "pass_turnover": true,
+  "pass_fitness": false,
+  "all_pass": false,
+  "grid_search": [
+    {
+      "rank": 1,
+      "params": {
+        "fast": 10,
+        "slow": 50
+      },
+      "sharpe_is": 0.4098908548342485,
+      "sharpe_oos": -1.3062863869625658,
+      "maxdd_oos": 0.0007969177821405224,
+      "fitness_oos": -0.002394674865581934,
+      "trades": 0,
+      "turnover_oos": 0.00546448087431694,
+      "pass_sharpe": false,
+      "pass_dd": true,
+      "pass_turnover": false,
+      "pass_fitness": false,
+      "all_pass": false
+    },
+    {
+      "rank": 2,
+      "params": {
+        "fast": 15,
+        "slow": 50
+      },
+      "sharpe_is": 0.405929470493757,
+      "sharpe_oos": -1.1508397281296072,
+      "maxdd_oos": 0.0007703031211816521,
+      "fitness_oos": -0.0019862392161200822,
+      "trades": 0,
+      "turnover_oos": 0.00546448087431694,
+      "pass_sharpe": false,
+      "pass_dd": true,
+      "pass_turnover": false,
+      "pass_fitness": false,
+      "all_pass": false
+    },
+    {
+      "rank": 3,
+      "params": {
+        "fast": 5,
+        "slow": 20
+      },
+      "sharpe_is": 0.2839630934326231,
+      "sharpe_oos": -0.509852770251969,
+      "maxdd_oos": 0.0009551871741356118,
+      "fitness_oos": -0.0003750012030444395,
+      "trades": 0,
+      "turnover_oos": 0.02185792349726776,
+      "pass_sharpe": false,
+      "pass_dd": true,
+      "pass_turnover": true,
+      "pass_fitness": false,
+      "all_pass": false
+    }
+  ]
+}
