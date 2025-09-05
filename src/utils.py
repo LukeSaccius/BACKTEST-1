@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import itertools
+import logging
 
 
 def read_price_csv(path, dtfmt="%Y-%m-%d"):
@@ -34,6 +35,15 @@ def read_price_csv(path, dtfmt="%Y-%m-%d"):
         rename[cand_orig] = need
     df = df.rename(columns=rename)
     df["date"] = pd.to_datetime(df["date"], format=dtfmt, errors="coerce")
+
+    # Count and drop rows with invalid dates
+    n_nat = int(df["date"].isna().sum())
+    if n_nat > 0:
+        logging.warning(f"Dropping {n_nat} rows with NaT dates from {path}")
+        df = df.dropna(subset=["date"])
+
+    if df.empty:
+        raise ValueError(f"No valid rows remain after dropping NaT dates from {path}")
 
     # Determine which columns to return
     required_cols = ["date", "open", "high", "low", "close", "volume"]
