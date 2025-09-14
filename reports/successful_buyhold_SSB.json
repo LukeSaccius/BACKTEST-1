@@ -1,0 +1,19 @@
+{
+  "strategy": "buyhold",
+  "symbol": "SSB",
+  "in_sample": {
+    "return": 6.540742404773716,
+    "sharpe": 0.2713843072572235,
+    "drawdown": 12.040870466385844,
+    "trades": 8,
+    "sqn": 0.3240077525381349
+  },
+  "out_of_sample": {
+    "return": -7.783194460111612,
+    "sharpe": 0,
+    "drawdown": 10.028339009938454,
+    "trades": 8,
+    "sqn": -2.3251620121801566
+  },
+  "passed_criteria": false
+}

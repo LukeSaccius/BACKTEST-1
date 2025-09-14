@@ -1,0 +1,19 @@
+{
+  "strategy": "ultimate",
+  "symbol": "SSB",
+  "in_sample": {
+    "return": 3.212583917964905,
+    "sharpe": 0.05166413087835538,
+    "drawdown": 29.99596243580333,
+    "trades": 8,
+    "sqn": 0.08706625535174287
+  },
+  "out_of_sample": {
+    "return": -12.40541721489145,
+    "sharpe": -1.1612198900976263,
+    "drawdown": 12.717268725511559,
+    "trades": 8,
+    "sqn": -3.3397835908183944
+  },
+  "passed_criteria": false
+}

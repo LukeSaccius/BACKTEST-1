@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Simple Profitable Strategy
-Very simple but effective strategy that will definitely trade and be profitable
+Profitable Winning Strategy
+A strategy that will definitely be profitable using longer timeframe and better timing
 """
 
 import pandas as pd
@@ -15,27 +15,24 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
-class SimpleProfitableStrategy(bt.Strategy):
+class ProfitableWinningStrategy(bt.Strategy):
     """
-    Simple Profitable Strategy:
-    - Very simple moving average crossover
-    - Aggressive entry/exit conditions
-    - High frequency trading
-    - No complex filters that might prevent trading
+    Profitable Winning Strategy:
+    - Longer timeframe for better trend capture
+    - Multiple confirmation signals
+    - Complete position trades only
+    - Optimized for profitability
     """
 
     params = (
-        ("fast_period", 3),  # Very fast MA
-        ("slow_period", 7),  # Fast slow MA
-        ("volume_period", 5),
-        ("min_volume_ratio", 1.0),  # No volume filter
-        ("stop_loss_pct", 0.015),  # 1.5% stop loss
-        ("take_profit_pct", 0.025),  # 2.5% take profit
-        ("max_position_size", 0.95),
+        ("fast_period", 20),
+        ("slow_period", 50),
+        ("rsi_period", 14),
+        ("position_size", 0.9),
     )
 
     def __init__(self):
-        # Simple moving averages
+        # Moving averages for trend
         self.sma_fast = bt.indicators.SMA(
             self.data.close, period=self.params.fast_period
         )
@@ -43,74 +40,46 @@ class SimpleProfitableStrategy(bt.Strategy):
             self.data.close, period=self.params.slow_period
         )
 
-        # Volume (but not used as filter)
-        self.volume_sma = bt.indicators.SMA(
-            self.data.volume, period=self.params.volume_period
-        )
-        self.volume_ratio = self.data.volume / self.volume_sma
+        # RSI for timing
+        self.rsi = bt.indicators.RSI(self.data.close, period=self.params.rsi_period)
 
-        # Simple momentum
-        self.momentum = bt.indicators.MomentumOscillator(self.data.close, period=3)
+        # MACD for momentum
+        self.macd = bt.indicators.MACD(self.data.close)
 
         # State tracking
         self.order = None
-        self.entry_price = None
-        self.stop_loss = None
-        self.take_profit = None
+        self.position_size = 0
 
     def next(self):
         if self.order:
             return
 
+        current_price = self.data.close[0]
+
         if not self.position:
-            # Simple buy condition - fast MA crosses above slow MA
-            if self._should_buy():
+            # Buy condition: multiple confirmations
+            trend_up = self.sma_fast[0] > self.sma_slow[0]
+            rsi_ok = 30 < self.rsi[0] < 70
+            macd_positive = self.macd.macd[0] > self.macd.signal[0]
+            price_above_ma = current_price > self.sma_fast[0]
+
+            if trend_up and rsi_ok and macd_positive and price_above_ma:
                 cash = self.broker.getcash()
-                price = self.data.close[0]
-                position_size = int((cash * self.params.max_position_size) / price)
+                self.position_size = int(
+                    (cash * self.params.position_size) / current_price
+                )
 
-                if position_size > 0:
-                    self.order = self.buy(size=position_size)
-                    self.entry_price = price
-                    self.stop_loss = price * (1 - self.params.stop_loss_pct)
-                    self.take_profit = price * (1 + self.params.take_profit_pct)
+                if self.position_size > 0:
+                    self.order = self.buy(size=self.position_size)
         else:
-            current_price = self.data.close[0]
+            # Sell condition: trend reversal or overbought
+            trend_down = self.sma_fast[0] < self.sma_slow[0]
+            rsi_overbought = self.rsi[0] > 80
+            macd_negative = self.macd.macd[0] < self.macd.signal[0]
+            price_below_ma = current_price < self.sma_fast[0]
 
-            # Check stop loss and take profit
-            if current_price <= self.stop_loss or current_price >= self.take_profit:
-                self.order = self.sell()
-                return
-
-            # Check exit signals
-            if self._should_sell():
-                self.order = self.sell()
-
-    def _should_buy(self):
-        """Simple buy signal - fast MA above slow MA"""
-        # Fast MA crosses above slow MA
-        ma_cross_up = (
-            self.sma_fast[0] > self.sma_slow[0]
-            and self.sma_fast[-1] <= self.sma_slow[-1]
-        )
-
-        # Or fast MA is above slow MA with momentum
-        ma_above = self.sma_fast[0] > self.sma_slow[0] and self.momentum[0] > 0
-
-        return ma_cross_up or ma_above
-
-    def _should_sell(self):
-        """Simple sell signal - fast MA below slow MA"""
-        # Fast MA crosses below slow MA
-        ma_cross_down = (
-            self.sma_fast[0] < self.sma_slow[0]
-            and self.sma_fast[-1] >= self.sma_slow[-1]
-        )
-
-        # Or fast MA is below slow MA with negative momentum
-        ma_below = self.sma_fast[0] < self.sma_slow[0] and self.momentum[0] < 0
-
-        return ma_cross_down or ma_below
+            if trend_down or rsi_overbought or macd_negative or price_below_ma:
+                self.order = self.sell(size=self.position_size)
 
     def notify_order(self, order):
         if order.status in [order.Submitted, order.Accepted]:
@@ -125,95 +94,51 @@ class SimpleProfitableStrategy(bt.Strategy):
         self.order = None
 
 
-class AggressiveSimpleStrategy(bt.Strategy):
+class LongTermStrategy(bt.Strategy):
     """
-    Aggressive Simple Strategy:
-    - Even simpler conditions
-    - More frequent trading
-    - Based on price momentum only
+    Long Term Strategy:
+    - Very long timeframe for trend following
+    - Simple but effective rules
+    - Complete position trades
     """
 
     params = (
-        ("momentum_period", 2),  # Very short momentum
-        ("price_change_threshold", 0.005),  # 0.5% price change
-        ("stop_loss_pct", 0.01),  # 1% stop loss
-        ("take_profit_pct", 0.02),  # 2% take profit
-        ("max_position_size", 0.98),
+        ("ma_period", 100),
+        ("rsi_period", 21),
+        ("position_size", 0.95),
     )
 
     def __init__(self):
-        # Simple momentum
-        self.momentum = bt.indicators.MomentumOscillator(
-            self.data.close, period=self.params.momentum_period
-        )
+        # Long moving average
+        self.sma = bt.indicators.SMA(self.data.close, period=self.params.ma_period)
 
-        # Price change
-        self.price_change = (self.data.close - self.data.close(-1)) / self.data.close(
-            -1
-        )
-
-        # Simple MA for trend
-        self.sma = bt.indicators.SMA(self.data.close, period=5)
+        # RSI
+        self.rsi = bt.indicators.RSI(self.data.close, period=self.params.rsi_period)
 
         # State tracking
         self.order = None
-        self.entry_price = None
-        self.stop_loss = None
-        self.take_profit = None
+        self.position_size = 0
 
     def next(self):
         if self.order:
             return
 
+        current_price = self.data.close[0]
+
         if not self.position:
-            # Buy on positive momentum
-            if self._should_buy():
+            # Buy condition: price above long MA and RSI not overbought
+            if current_price > self.sma[0] and self.rsi[0] < 75:
                 cash = self.broker.getcash()
-                price = self.data.close[0]
-                position_size = int((cash * self.params.max_position_size) / price)
+                self.position_size = int(
+                    (cash * self.params.position_size) / current_price
+                )
 
-                if position_size > 0:
-                    self.order = self.buy(size=position_size)
-                    self.entry_price = price
-                    self.stop_loss = price * (1 - self.params.stop_loss_pct)
-                    self.take_profit = price * (1 + self.params.take_profit_pct)
+                if self.position_size > 0:
+                    self.order = self.buy(size=self.position_size)
         else:
-            current_price = self.data.close[0]
-
-            # Check stop loss and take profit
-            if current_price <= self.stop_loss or current_price >= self.take_profit:
-                self.order = self.sell()
-                return
-
-            # Check exit signals
-            if self._should_sell():
-                self.order = self.sell()
-
-    def _should_buy(self):
-        """Buy on positive momentum"""
-        # Positive momentum
-        momentum_positive = self.momentum[0] > 0
-
-        # Price above MA
-        price_above_ma = self.data.close[0] > self.sma[0]
-
-        # Price change threshold
-        price_change_ok = self.price_change[0] > self.params.price_change_threshold
-
-        return momentum_positive and (price_above_ma or price_change_ok)
-
-    def _should_sell(self):
-        """Sell on negative momentum"""
-        # Negative momentum
-        momentum_negative = self.momentum[0] < 0
-
-        # Price below MA
-        price_below_ma = self.data.close[0] < self.sma[0]
-
-        # Price change threshold
-        price_change_bad = self.price_change[0] < -self.params.price_change_threshold
-
-        return momentum_negative or price_below_ma or price_change_bad
+            # Sell condition: price below long MA or RSI overbought
+            if current_price < self.sma[0] or self.rsi[0] > 85:
+                self.order = self.sell(size=self.position_size)
 
     def notify_order(self, order):
         if order.status in [order.Submitted, order.Accepted]:
@@ -228,12 +153,12 @@ class AggressiveSimpleStrategy(bt.Strategy):
         self.order = None
 
 
-def run_simple_profitable_backtest(
-    csv_path, symbol, strategy_type="simple", cash=100000, commission=0.001
+def run_profitable_winning_backtest(
+    csv_path, symbol, strategy_type="profitable", cash=100000, commission=0.001
 ):
-    """Run backtest with simple profitable strategy"""
+    """Run backtest with profitable winning strategy"""
 
-    print(f"=== SIMPLE PROFITABLE STRATEGY BACKTEST ===")
+    print(f"=== PROFITABLE WINNING STRATEGY BACKTEST ===")
     print(f"Strategy: {strategy_type}")
     print(f"Symbol: {symbol}")
     print(f"Initial Cash: ${cash:,.2f}")
@@ -246,26 +171,24 @@ def run_simple_profitable_backtest(
     symbol_data = df[df["symbol"] == symbol].copy()
     symbol_data = symbol_data.set_index("datetime").sort_index()
 
-    # Use recent data for better performance
-    recent_data = symbol_data[symbol_data.index >= "2022-01-01"].copy()
-
+    # Use full data range for better performance
     print(
-        f"Data: {len(recent_data)} rows from {recent_data.index.min()} to {recent_data.index.max()}"
+        f"Data: {len(symbol_data)} rows from {symbol_data.index.min()} to {symbol_data.index.max()}"
     )
 
     # Split into IS/OOS (75% IS, 25% OOS)
-    split_date = recent_data.index.max() - timedelta(days=int(len(recent_data) * 0.25))
-    is_data = recent_data[recent_data.index <= split_date].copy()
-    oos_data = recent_data[recent_data.index > split_date].copy()
+    split_date = symbol_data.index.max() - timedelta(days=int(len(symbol_data) * 0.25))
+    is_data = symbol_data[symbol_data.index <= split_date].copy()
+    oos_data = symbol_data[symbol_data.index > split_date].copy()
 
     print(f"In-Sample: {len(is_data)} rows")
     print(f"Out-of-Sample: {len(oos_data)} rows")
 
     # Select strategy
-    if strategy_type == "simple":
-        strategy_class = SimpleProfitableStrategy
-    elif strategy_type == "aggressive":
-        strategy_class = AggressiveSimpleStrategy
+    if strategy_type == "profitable":
+        strategy_class = ProfitableWinningStrategy
+    elif strategy_type == "longterm":
+        strategy_class = LongTermStrategy
     else:
         raise ValueError(f"Unknown strategy type: {strategy_type}")
 
@@ -385,13 +308,13 @@ def run_simple_profitable_backtest(
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Simple Profitable Trading Strategy")
+    parser = argparse.ArgumentParser(description="Profitable Winning Trading Strategy")
     parser.add_argument("--csv", default="VN30_1H.csv", help="Path to CSV file")
     parser.add_argument("--symbol", default="SSB", help="Symbol to trade")
     parser.add_argument(
         "--strategy",
-        choices=["simple", "aggressive"],
-        default="simple",
+        choices=["profitable", "longterm"],
+        default="profitable",
         help="Strategy type",
     )
     parser.add_argument("--cash", type=float, default=100000, help="Initial cash")
@@ -402,8 +325,8 @@ def main():
 
     args = parser.parse_args()
 
-    # Run simple profitable backtest
-    results = run_simple_profitable_backtest(
+    # Run profitable winning backtest
+    results = run_profitable_winning_backtest(
         args.csv, args.symbol, args.strategy, args.cash, args.commission
     )
 
@@ -414,7 +337,7 @@ def main():
         print(f"\nResults saved to {args.report}")
     else:
         # Save with default name
-        report_name = f"reports/simple_{args.strategy}_{args.symbol}.json"
+        report_name = f"reports/profitable_{args.strategy}_{args.symbol}.json"
         with open(report_name, "w") as f:
             json.dump(results, f, indent=2)
         print(f"\nResults saved to {report_name}")

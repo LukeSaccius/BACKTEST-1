@@ -1,0 +1,19 @@
+{
+  "strategy": "longterm",
+  "symbol": "SSB",
+  "in_sample": {
+    "return": -0.6042934122486476,
+    "sharpe": 0.010593311928512802,
+    "drawdown": 20.516445193226634,
+    "trades": 8,
+    "sqn": -0.056248003780396565
+  },
+  "out_of_sample": {
+    "return": -5.462212499999994,
+    "sharpe": -1.3661519942697218,
+    "drawdown": 10.436337878210042,
+    "trades": 8,
+    "sqn": 0
+  },
+  "passed_criteria": false
+}

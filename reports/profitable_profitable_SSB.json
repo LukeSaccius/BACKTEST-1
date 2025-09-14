@@ -1,0 +1,19 @@
+{
+  "strategy": "profitable",
+  "symbol": "SSB",
+  "in_sample": {
+    "return": -0.9769668338146295,
+    "sharpe": -0.1774461864730573,
+    "drawdown": 19.590635695353846,
+    "trades": 8,
+    "sqn": -0.07175986026829163
+  },
+  "out_of_sample": {
+    "return": -5.501527457166667,
+    "sharpe": -1.363535402771582,
+    "drawdown": 5.812355212827665,
+    "trades": 8,
+    "sqn": 0
+  },
+  "passed_criteria": false
+}

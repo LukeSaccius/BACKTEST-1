@@ -149,7 +149,8 @@ class SMACrossoverStrategy(bt.Strategy):
                 self.order = self.buy()
         else:
             if self.crossover < 0:
-                self.order = self.sell()
+                # Close existing long position fully
+                self.order = self.close()
 
     def notify_order(self, order):
         if order.status in [order.Submitted, order.Accepted]:
@@ -180,7 +181,8 @@ class RSIMeanReversionStrategy(bt.Strategy):
                 self.order = self.buy()
         else:
             if self.rsi > self.params.rsi_exit:
-                self.order = self.sell()
+                # Close existing long position fully
+                self.order = self.close()
 
     def notify_order(self, order):
         if order.status in [order.Submitted, order.Accepted]:

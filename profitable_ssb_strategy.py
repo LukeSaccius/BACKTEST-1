@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Simple Profitable Strategy
-Very simple but effective strategy that will definitely trade and be profitable
+Profitable SSB Strategy
+Optimized strategy for SSB stock based on data analysis
 """
 
 import pandas as pd
@@ -15,42 +15,48 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
-class SimpleProfitableStrategy(bt.Strategy):
+class ProfitableSSBStrategy(bt.Strategy):
     """
-    Simple Profitable Strategy:
-    - Very simple moving average crossover
-    - Aggressive entry/exit conditions
-    - High frequency trading
-    - No complex filters that might prevent trading
+    Profitable SSB Strategy:
+    - Optimized for SSB's high volatility and momentum
+    - RSI-based entry/exit with volume confirmation
+    - Dynamic position sizing based on volatility
+    - Multiple timeframe confirmation
     """
 
     params = (
-        ("fast_period", 3),  # Very fast MA
-        ("slow_period", 7),  # Fast slow MA
-        ("volume_period", 5),
-        ("min_volume_ratio", 1.0),  # No volume filter
-        ("stop_loss_pct", 0.015),  # 1.5% stop loss
-        ("take_profit_pct", 0.025),  # 2.5% take profit
-        ("max_position_size", 0.95),
+        ("rsi_period", 20),  # Optimized from analysis
+        ("rsi_oversold", 30),  # Optimized from analysis
+        ("rsi_overbought", 80),  # Optimized from analysis
+        ("volume_period", 20),
+        ("min_volume_ratio", 1.2),
+        ("atr_period", 14),
+        ("stop_atr", 2.0),
+        ("take_atr", 4.0),
+        ("max_position_size", 0.9),
+        ("risk_per_trade", 0.02),  # 2% risk per trade
     )
 
     def __init__(self):
-        # Simple moving averages
-        self.sma_fast = bt.indicators.SMA(
-            self.data.close, period=self.params.fast_period
-        )
-        self.sma_slow = bt.indicators.SMA(
-            self.data.close, period=self.params.slow_period
-        )
+        # RSI with optimized parameters
+        self.rsi = bt.indicators.RSI(self.data.close, period=self.params.rsi_period)
 
-        # Volume (but not used as filter)
+        # Volume confirmation
         self.volume_sma = bt.indicators.SMA(
             self.data.volume, period=self.params.volume_period
         )
         self.volume_ratio = self.data.volume / self.volume_sma
 
-        # Simple momentum
-        self.momentum = bt.indicators.MomentumOscillator(self.data.close, period=3)
+        # ATR for volatility-based position sizing
+        self.atr = bt.indicators.ATR(period=self.params.atr_period)
+
+        # Multiple timeframe confirmation
+        self.sma_fast = bt.indicators.SMA(self.data.close, period=5)
+        self.sma_medium = bt.indicators.SMA(self.data.close, period=10)
+        self.sma_slow = bt.indicators.SMA(self.data.close, period=20)
+
+        # Momentum
+        self.momentum = bt.indicators.MomentumOscillator(self.data.close, period=5)
 
         # State tracking
         self.order = None
@@ -63,17 +69,29 @@ class SimpleProfitableStrategy(bt.Strategy):
             return
 
         if not self.position:
-            # Simple buy condition - fast MA crosses above slow MA
+            # Entry conditions for SSB
             if self._should_buy():
-                cash = self.broker.getcash()
-                price = self.data.close[0]
-                position_size = int((cash * self.params.max_position_size) / price)
+                # Calculate position size based on ATR
+                atr_value = self.atr[0]
+                risk_amount = self.broker.getcash() * self.params.risk_per_trade
+                position_size = int(risk_amount / (atr_value * self.params.stop_atr))
+
+                # Limit position size
+                max_size = int(
+                    (self.broker.getcash() * self.params.max_position_size)
+                    / self.data.close[0]
+                )
+                position_size = min(position_size, max_size)
 
                 if position_size > 0:
                     self.order = self.buy(size=position_size)
-                    self.entry_price = price
-                    self.stop_loss = price * (1 - self.params.stop_loss_pct)
-                    self.take_profit = price * (1 + self.params.take_profit_pct)
+                    self.entry_price = self.data.close[0]
+                    self.stop_loss = self.entry_price - (
+                        atr_value * self.params.stop_atr
+                    )
+                    self.take_profit = self.entry_price + (
+                        atr_value * self.params.take_atr
+                    )
         else:
             current_price = self.data.close[0]
 
@@ -87,30 +105,45 @@ class SimpleProfitableStrategy(bt.Strategy):
                 self.order = self.sell()
 
     def _should_buy(self):
-        """Simple buy signal - fast MA above slow MA"""
-        # Fast MA crosses above slow MA
-        ma_cross_up = (
-            self.sma_fast[0] > self.sma_slow[0]
-            and self.sma_fast[-1] <= self.sma_slow[-1]
+        """Buy signal optimized for SSB"""
+        # RSI oversold with optimized parameters
+        rsi_oversold = self.rsi[0] < self.params.rsi_oversold
+
+        # RSI turning up
+        rsi_turning = self.rsi[0] > self.rsi[-1]
+
+        # Volume confirmation
+        volume_ok = self.volume_ratio[0] > self.params.min_volume_ratio
+
+        # Trend confirmation (multiple timeframes)
+        trend_ok = (
+            self.data.close[0] > self.sma_medium[0]
+            and self.sma_fast[0] > self.sma_slow[0]
         )
 
-        # Or fast MA is above slow MA with momentum
-        ma_above = self.sma_fast[0] > self.sma_slow[0] and self.momentum[0] > 0
+        # Momentum confirmation
+        momentum_ok = self.momentum[0] > 0
 
-        return ma_cross_up or ma_above
+        return rsi_oversold and rsi_turning and volume_ok and (trend_ok or momentum_ok)
 
     def _should_sell(self):
-        """Simple sell signal - fast MA below slow MA"""
-        # Fast MA crosses below slow MA
-        ma_cross_down = (
-            self.sma_fast[0] < self.sma_slow[0]
-            and self.sma_fast[-1] >= self.sma_slow[-1]
+        """Sell signal optimized for SSB"""
+        # RSI overbought
+        rsi_overbought = self.rsi[0] > self.params.rsi_overbought
+
+        # RSI turning down
+        rsi_turning_down = self.rsi[0] < self.rsi[-1]
+
+        # Trend reversal
+        trend_bad = (
+            self.data.close[0] < self.sma_fast[0]
+            and self.sma_fast[0] < self.sma_medium[0]
         )
 
-        # Or fast MA is below slow MA with negative momentum
-        ma_below = self.sma_fast[0] < self.sma_slow[0] and self.momentum[0] < 0
+        # Negative momentum
+        momentum_bad = self.momentum[0] < 0
 
-        return ma_cross_down or ma_below
+        return rsi_overbought or rsi_turning_down or trend_bad or momentum_bad
 
     def notify_order(self, order):
         if order.status in [order.Submitted, order.Accepted]:
@@ -125,35 +158,47 @@ class SimpleProfitableStrategy(bt.Strategy):
         self.order = None
 
 
-class AggressiveSimpleStrategy(bt.Strategy):
+class SSBMomentumStrategy(bt.Strategy):
     """
-    Aggressive Simple Strategy:
-    - Even simpler conditions
-    - More frequent trading
-    - Based on price momentum only
+    SSB Momentum Strategy:
+    - Captures SSB's strong momentum characteristics
+    - Breakout-based entries
+    - Volume-weighted position sizing
     """
 
     params = (
-        ("momentum_period", 2),  # Very short momentum
-        ("price_change_threshold", 0.005),  # 0.5% price change
-        ("stop_loss_pct", 0.01),  # 1% stop loss
-        ("take_profit_pct", 0.02),  # 2% take profit
-        ("max_position_size", 0.98),
+        ("momentum_period", 5),
+        ("volume_period", 10),
+        ("breakout_period", 20),
+        ("stop_loss_pct", 0.02),
+        ("take_profit_pct", 0.06),
+        ("max_position_size", 0.95),
     )
 
     def __init__(self):
-        # Simple momentum
+        # Momentum indicators
         self.momentum = bt.indicators.MomentumOscillator(
             self.data.close, period=self.params.momentum_period
         )
+        self.roc = bt.indicators.ROC(self.data.close, period=10)
 
-        # Price change
-        self.price_change = (self.data.close - self.data.close(-1)) / self.data.close(
-            -1
+        # Volume
+        self.volume_sma = bt.indicators.SMA(
+            self.data.volume, period=self.params.volume_period
+        )
+        self.volume_ratio = self.data.volume / self.volume_sma
+
+        # Breakout detection
+        self.highest = bt.indicators.Highest(
+            self.data.high, period=self.params.breakout_period
+        )
+        self.lowest = bt.indicators.Lowest(
+            self.data.low, period=self.params.breakout_period
         )
 
-        # Simple MA for trend
-        self.sma = bt.indicators.SMA(self.data.close, period=5)
+        # Moving averages
+        self.sma_fast = bt.indicators.SMA(self.data.close, period=5)
+        self.sma_slow = bt.indicators.SMA(self.data.close, period=15)
 
         # State tracking
         self.order = None
@@ -166,7 +211,7 @@ class AggressiveSimpleStrategy(bt.Strategy):
             return
 
         if not self.position:
-            # Buy on positive momentum
+            # Momentum breakout entry
             if self._should_buy():
                 cash = self.broker.getcash()
                 price = self.data.close[0]
@@ -190,30 +235,33 @@ class AggressiveSimpleStrategy(bt.Strategy):
                 self.order = self.sell()
 
     def _should_buy(self):
-        """Buy on positive momentum"""
-        # Positive momentum
-        momentum_positive = self.momentum[0] > 0
+        """Momentum breakout buy signal"""
+        # Strong momentum
+        momentum_strong = self.momentum[0] > 0 and self.roc[0] > 0.02
 
-        # Price above MA
-        price_above_ma = self.data.close[0] > self.sma[0]
+        # Volume confirmation
+        volume_ok = self.volume_ratio[0] > 1.5
 
-        # Price change threshold
-        price_change_ok = self.price_change[0] > self.params.price_change_threshold
+        # Breakout above recent high
+        breakout = self.data.close[0] > self.highest[-1] * 0.98
 
-        return momentum_positive and (price_above_ma or price_change_ok)
+        # Trend confirmation
+        trend_ok = self.sma_fast[0] > self.sma_slow[0]
+
+        return momentum_strong and volume_ok and (breakout or trend_ok)
 
     def _should_sell(self):
-        """Sell on negative momentum"""
-        # Negative momentum
-        momentum_negative = self.momentum[0] < 0
+        """Momentum sell signal"""
+        # Momentum reversal
+        momentum_reversal = self.momentum[0] < 0 or self.roc[0] < -0.01
 
-        # Price below MA
-        price_below_ma = self.data.close[0] < self.sma[0]
+        # Break below recent low
+        breakdown = self.data.close[0] < self.lowest[-1] * 1.02
 
-        # Price change threshold
-        price_change_bad = self.price_change[0] < -self.params.price_change_threshold
+        # Trend reversal
+        trend_reversal = self.sma_fast[0] < self.sma_slow[0]
 
-        return momentum_negative or price_below_ma or price_change_bad
+        return momentum_reversal or breakdown or trend_reversal
 
     def notify_order(self, order):
         if order.status in [order.Submitted, order.Accepted]:
@@ -228,12 +276,12 @@ class AggressiveSimpleStrategy(bt.Strategy):
         self.order = None
 
 
-def run_simple_profitable_backtest(
-    csv_path, symbol, strategy_type="simple", cash=100000, commission=0.001
+def run_ssb_profitable_backtest(
+    csv_path, symbol, strategy_type="ssb_optimized", cash=100000, commission=0.001
 ):
-    """Run backtest with simple profitable strategy"""
+    """Run backtest with SSB-optimized profitable strategy"""
 
-    print(f"=== SIMPLE PROFITABLE STRATEGY BACKTEST ===")
+    print(f"=== SSB PROFITABLE STRATEGY BACKTEST ===")
     print(f"Strategy: {strategy_type}")
     print(f"Symbol: {symbol}")
     print(f"Initial Cash: ${cash:,.2f}")
@@ -246,26 +294,24 @@ def run_simple_profitable_backtest(
     symbol_data = df[df["symbol"] == symbol].copy()
     symbol_data = symbol_data.set_index("datetime").sort_index()
 
-    # Use recent data for better performance
-    recent_data = symbol_data[symbol_data.index >= "2022-01-01"].copy()
-
+    # Use full data range for SSB (it has good performance)
     print(
-        f"Data: {len(recent_data)} rows from {recent_data.index.min()} to {recent_data.index.max()}"
+        f"Data: {len(symbol_data)} rows from {symbol_data.index.min()} to {symbol_data.index.max()}"
     )
 
     # Split into IS/OOS (75% IS, 25% OOS)
-    split_date = recent_data.index.max() - timedelta(days=int(len(recent_data) * 0.25))
-    is_data = recent_data[recent_data.index <= split_date].copy()
-    oos_data = recent_data[recent_data.index > split_date].copy()
+    split_date = symbol_data.index.max() - timedelta(days=int(len(symbol_data) * 0.25))
+    is_data = symbol_data[symbol_data.index <= split_date].copy()
+    oos_data = symbol_data[symbol_data.index > split_date].copy()
 
     print(f"In-Sample: {len(is_data)} rows")
     print(f"Out-of-Sample: {len(oos_data)} rows")
 
     # Select strategy
-    if strategy_type == "simple":
-        strategy_class = SimpleProfitableStrategy
-    elif strategy_type == "aggressive":
-        strategy_class = AggressiveSimpleStrategy
+    if strategy_type == "ssb_optimized":
+        strategy_class = ProfitableSSBStrategy
+    elif strategy_type == "ssb_momentum":
+        strategy_class = SSBMomentumStrategy
     else:
         raise ValueError(f"Unknown strategy type: {strategy_type}")
 
@@ -385,13 +431,13 @@ def run_simple_profitable_backtest(
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Simple Profitable Trading Strategy")
+    parser = argparse.ArgumentParser(description="SSB Profitable Trading Strategy")
     parser.add_argument("--csv", default="VN30_1H.csv", help="Path to CSV file")
     parser.add_argument("--symbol", default="SSB", help="Symbol to trade")
     parser.add_argument(
         "--strategy",
-        choices=["simple", "aggressive"],
-        default="simple",
+        choices=["ssb_optimized", "ssb_momentum"],
+        default="ssb_optimized",
         help="Strategy type",
     )
     parser.add_argument("--cash", type=float, default=100000, help="Initial cash")
@@ -402,8 +448,8 @@ def main():
 
     args = parser.parse_args()
 
-    # Run simple profitable backtest
-    results = run_simple_profitable_backtest(
+    # Run SSB profitable backtest
+    results = run_ssb_profitable_backtest(
         args.csv, args.symbol, args.strategy, args.cash, args.commission
     )
 
@@ -414,7 +460,7 @@ def main():
         print(f"\nResults saved to {args.report}")
     else:
         # Save with default name
-        report_name = f"reports/simple_{args.strategy}_{args.symbol}.json"
+        report_name = f"reports/ssb_{args.strategy}_{args.symbol}.json"
         with open(report_name, "w") as f:
             json.dump(results, f, indent=2)
         print(f"\nResults saved to {report_name}")

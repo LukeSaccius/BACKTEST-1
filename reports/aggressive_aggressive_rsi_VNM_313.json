@@ -1,0 +1,19 @@
+{
+  "strategy": "aggressive_rsi",
+  "symbol": "VNM",
+  "in_sample": {
+    "return": 5.946879013557481,
+    "sharpe": 0.3685261257715489,
+    "drawdown": 4.720873086290093,
+    "trades": 33,
+    "sqn": 0.6200094066986032
+  },
+  "out_of_sample": {
+    "return": 11.080562416625966,
+    "sharpe": 2.8539508360593175,
+    "drawdown": 1.687763096341621,
+    "trades": 10,
+    "sqn": 1.9856476607140396
+  },
+  "passed_criteria": false
+}
