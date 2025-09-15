@@ -16,13 +16,14 @@ warnings.filterwarnings("ignore")
 
 
 class AggressiveRSIStrategy(bt.Strategy):
-    """
-    Aggressive RSI Strategy:
-    - Fast RSI signals
-    - Multiple entry/exit points
-    - Volume confirmation
-    - Dynamic position sizing
-    - Tight stop losses
+    """Aggressive RSI Strategy (long only).
+
+    Signals and risk controls:
+    - Fast RSI for frequent signals
+    - Volume confirmation via volume/volume_sma ratio
+    - Light trend filter using short/slow SMAs
+    - Full-position exits using `close()` on stop-loss/take-profit or signal
+    - Max position sizing as a fraction of cash
     """
 
     params = (
@@ -59,6 +60,11 @@ class AggressiveRSIStrategy(bt.Strategy):
         self.take_profit = None
 
     def next(self):
+        """Main per-bar logic: handle entries and exits.
+
+        Note: use `close()` to exit an existing long position completely,
+        instead of `sell()` without a size (which can flip short or be partial).
+        """
         if self.order:
             return
 
@@ -89,7 +95,7 @@ class AggressiveRSIStrategy(bt.Strategy):
                 self.order = self.close()
 
     def _should_buy(self):
-        """Aggressive buy signal"""
+        """Aggressive buy signal combining RSI, volume and trend."""
         # RSI oversold
         rsi_oversold = self.rsi[0] < self.params.rsi_oversold
 
@@ -105,7 +111,7 @@ class AggressiveRSIStrategy(bt.Strategy):
         return rsi_oversold and (rsi_turning or volume_ok) and trend_ok
 
     def _should_sell(self):
-        """Aggressive sell signal"""
+        """Aggressive sell signal via RSI, momentum and price/MA."""
         # RSI overbought
         rsi_overbought = self.rsi[0] > self.params.rsi_overbought
 
@@ -118,6 +124,7 @@ class AggressiveRSIStrategy(bt.Strategy):
         return rsi_overbought or rsi_turning_down or trend_bad
 
     def notify_order(self, order):
+        """Log order completions for transparency."""
         if order.status in [order.Submitted, order.Accepted]:
             return
 
@@ -131,12 +138,7 @@ class AggressiveRSIStrategy(bt.Strategy):
 
 
 class ScalpingStrategy(bt.Strategy):
-    """
-    Scalping Strategy:
-    - Very fast signals
-    - Small profits, many trades
-    - Tight risk management
-    """
+    """Very fast RSI scalping with tight risk controls (long only)."""
 
     params = (
         ("rsi_period", 5),  # Very fast RSI
@@ -169,6 +171,7 @@ class ScalpingStrategy(bt.Strategy):
         self.take_profit = None
 
     def next(self):
+        """Per-bar logic for scalping entries/exits with full closes."""
         if self.order:
             return
 
@@ -198,7 +201,7 @@ class ScalpingStrategy(bt.Strategy):
                 self.order = self.close()
 
     def _should_buy(self):
-        """Scalping buy signal"""
+        """Scalping buy signal using RSI, momentum, and volume."""
         # RSI oversold
         rsi_oversold = self.rsi[0] < self.params.rsi_oversold
 
@@ -211,7 +214,7 @@ class ScalpingStrategy(bt.Strategy):
         return rsi_oversold and momentum_ok and volume_ok
 
     def _should_sell(self):
-        """Scalping sell signal"""
+        """Scalping sell signal using RSI and momentum."""
         # RSI overbought
         rsi_overbought = self.rsi[0] > self.params.rsi_overbought
 
@@ -221,6 +224,7 @@ class ScalpingStrategy(bt.Strategy):
         return rsi_overbought or momentum_bad
 
     def notify_order(self, order):
+        """Log order completions for scalping strategy."""
         if order.status in [order.Submitted, order.Accepted]:
             return
 
@@ -234,12 +238,7 @@ class ScalpingStrategy(bt.Strategy):
 
 
 class MeanReversionStrategy(bt.Strategy):
-    """
-    Mean Reversion Strategy:
-    - Buy oversold, sell overbought
-    - Multiple timeframe confirmation
-    - Volatility-based position sizing
-    """
+    """Mean reversion strategy with ATR-based stops/takes (long only)."""
 
     params = (
         ("rsi_period", 14),
@@ -278,6 +277,7 @@ class MeanReversionStrategy(bt.Strategy):
         self.take_profit = None
 
     def next(self):
+        """Per-bar logic for mean reversion entries and exits."""
         if self.order:
             return
 

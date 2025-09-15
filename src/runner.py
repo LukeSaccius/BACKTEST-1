@@ -1,3 +1,14 @@
+"""CLI runner to load CSV data, run strategies, and emit metrics.
+
+This module wires the strategy classes, analyzers, and utilities together.
+It supports:
+- Single IS/OOS run (default)
+- Optional walk-forward evaluation
+- Optional parameter grid search with OOS validation
+
+Outputs compact metrics to console and writes CSV/JSON artifacts to `reports/`.
+"""
+
 import argparse, json, os, glob, hashlib
 import pandas as pd, backtrader as bt
 from pathlib import Path
