@@ -40,6 +40,24 @@ def to_bt_feed(df):
     return bt.feeds.PandasData(dataname=df)
 
 
+def backtest_simulate(start, end, df, strategy_name, strategy_params, **kwargs):
+    """Run a backtest between start and end dates.
+
+    Args:
+        start: inclusive start date (datetime or str parsable by pandas)
+        end: inclusive end date (datetime or str)
+        df: pandas DataFrame with columns ['date','open','high','low','close','volume', ...]
+        strategy_name: 'sma' or 'rsi'
+        strategy_params: dict of strategy parameters
+        kwargs: broker/execution settings; passed through to run_once
+
+    Returns:
+        (metrics: dict, daily: Series) same format as run_once
+    """
+    sub = df[(df["date"] >= pd.to_datetime(start)) & (df["date"] <= pd.to_datetime(end))].copy()
+    return run_once(sub, strategy_name, strategy_params, **kwargs)
+
+
 def get_strategy_class(strategy_name: str):
     """Factory function to get strategy class by name."""
     strategies = {
@@ -348,6 +366,9 @@ def main():
     oos_m, oos_daily = run_once(oos_df, args.strategy, strategy_params, tf=args.tf, **common)
 
     # Additional protocol checks after metrics are available
+    sr_ratio = float('nan')
+    dr_ratio = float('nan')
+    robust_ok = False
     try:
         # Robustness 90% band: OOS ~ IS on Sharpe and avg daily return
         def _ratio(a, b):
@@ -366,12 +387,16 @@ def main():
         ) and (
             (0.9 <= dr_ratio <= 1.1) if dr_ratio == dr_ratio else False
         )
-        print("\n=== ROBUSTNESS CHECK ===")
-        print(f"- Sharpe OOS/IS: {sr_ratio:.2f}")
-        print(f"- DailyRet OOS/IS: {dr_ratio:.2f}")
-        print(f"- Result: {'PASS' if robust_ok else 'WARN'} (target ~90% band)")
     except Exception as e:
         print(f"[WARN] Robustness check issue: {e}")
+
+    print("\n=== ROBUSTNESS CHECK ===")
+    try:
+        print(f"- Sharpe OOS/IS: {sr_ratio:.2f}")
+        print(f"- DailyRet OOS/IS: {dr_ratio:.2f}")
+    except Exception:
+        pass
+    print(f"- Result: {'PASS' if robust_ok else 'WARN'} (target ~90% band)")
     
     # Cảnh báo nếu OOS "không có lệnh"
     if oos_m.get('n_trades', 0) == 0 and len(oos_daily) > 0 and abs(oos_daily).sum() < 1e-9:
@@ -398,6 +423,13 @@ def main():
             turnover=(0.01 < oos_m["turnover_per_day"] < 0.06),
             fitness=(oos_m["fitness"] > 2.1),
             daily_return=(oos_m["avg_daily_return"] >= 0.0004),
+            robustness=robust_ok,
+        ),
+        robustness=dict(
+            sharpe_ratio_ratio=sr_ratio,
+            daily_return_ratio=dr_ratio,
+            passed=robust_ok,
+            criterion="OOS/IS within 0.9–1.1 for Sharpe and AvgDaily",
         ),
     )
 

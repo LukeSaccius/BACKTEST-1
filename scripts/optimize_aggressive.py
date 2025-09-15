@@ -76,6 +76,27 @@ def score(oos_m: dict, is_m: dict, min_trades: int = 8) -> float:
     return v
 
 
+def robustness_pass(is_m: dict, oos_m: dict) -> bool:
+    """Check 90% band criterion: OOS ~ IS on Sharpe and AvgDaily.
+
+    If IS Sharpe is near zero, fall back to AvgDaily check only.
+    """
+    import math
+    def ratio(a, b):
+        try:
+            return a / b if (b not in (0, None) and not (hasattr(b, 'isna') and b.isna())) else math.nan
+        except Exception:
+            return math.nan
+    sr = ratio(oos_m.get("sharpe"), is_m.get("sharpe"))
+    dr = ratio(oos_m.get("avg_daily_return"), is_m.get("avg_daily_return"))
+    sharpe_ok = (0.9 <= sr <= 1.1) if sr == sr else False
+    daily_ok = (0.9 <= dr <= 1.1) if dr == dr else False
+    # If Sharpe is too small or NaN, allow daily-only check
+    if not sharpe_ok and (is_m.get("sharpe") in (0, None) or is_m.get("sharpe") != is_m.get("sharpe")):
+        return daily_ok
+    return sharpe_ok and daily_ok
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--csv", default="VN30_1H.csv")
@@ -113,12 +134,15 @@ def main():
             is_m = run_once(is_df, params, args.cash, args.commission)
             oos_m = run_once(oos_df, params, args.cash, args.commission)
             s = score(oos_m, is_m, min_trades=8)
-            results.append(dict(params=params, is_metrics=is_m, oos_metrics=oos_m, score=s))
+            rob = robustness_pass(is_m, oos_m)
+            results.append(dict(params=params, is_metrics=is_m, oos_metrics=oos_m, score=s, robust=rob))
         except Exception as e:
             # skip failed combos
             continue
 
     results.sort(key=lambda r: r["score"], reverse=True)
+    # Prefer robust configs first; then by score
+    results.sort(key=lambda r: (not r["robust"], -r["score"]))
     top = results[:10]
 
     # Print concise summary
@@ -127,7 +151,7 @@ def main():
         p = r["params"]
         om = r["oos_metrics"]
         print(
-            f"score={r['score']:.2f} oos_sharpe={om['sharpe']:.2f} oos_trades={om['trades']} oos_dd={om['drawdown']:.2f}% params={p}"
+            f"robust={'PASS' if r['robust'] else 'FAIL'} score={r['score']:.2f} oos_sharpe={om['sharpe']:.2f} oos_trades={om['trades']} oos_dd={om['drawdown']:.2f}% params={p}"
         )
 
     # Save

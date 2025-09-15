@@ -106,7 +106,7 @@ Runner compares new OOS daily returns against prior `*_OOS_daily.csv` and flags 
 - Beware survivorship/backfill/data‑snooping
 
 #### Bias‑Free Protocol Checks
-- Data snooping:
+- data-snooping:
   - IS sample size ≥ 252 × number of free parameters
   - OOS share ≥ 1/3 of total rows (runner supports `--oos_years`)
   - Robustness: OOS/IS Sharpe and OOS/IS AvgDaily within ~90% band
@@ -142,5 +142,6 @@ python aggressive_profitable_strategy.py --csv VN30_1H.csv --symbol VNM \
 - **Normal Run**: JSON report, IS/OOS daily returns CSVs
 - **Grid Search**: Additional `*_grid.csv` and `*_grid.json` files
 - **All files**: Saved in `reports/` directory with clear naming
+
 
 
