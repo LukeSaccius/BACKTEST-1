@@ -291,7 +291,7 @@ def main():
     p.add_argument("--slippage_bps", type=float, default=0.0)
     p.add_argument("--sizer_perc", type=float, default=0.95)
     p.add_argument("--is_years", type=int, default=8)
-    p.add_argument("--oos_years", type=int, default=1)
+    p.add_argument("--oos_years", type=int, default=3)
     p.add_argument("--walkforward", action="store_true")
     p.add_argument("--grid", action="store_true")
     p.add_argument("--grid_spec", default="")
@@ -320,6 +320,9 @@ def main():
         qual["warnings"].append("Dates not monotonic")
 
     is_df, oos_df = split_is_oos(df_raw, args.is_years, args.oos_years)
+
+    # Protocol checks: sample size vs number of parameters and OOS proportion
+    # Note: we compute these after building params below as well for clarity in console.
     common = dict(
         cash=args.cash,
         commission=args.commission,
@@ -343,6 +346,32 @@ def main():
     
     is_m, is_daily = run_once(is_df, args.strategy, strategy_params, tf=args.tf, **common)
     oos_m, oos_daily = run_once(oos_df, args.strategy, strategy_params, tf=args.tf, **common)
+
+    # Additional protocol checks after metrics are available
+    try:
+        # Robustness 90% band: OOS ~ IS on Sharpe and avg daily return
+        def _ratio(a, b):
+            import math
+            try:
+                if b is None or b == 0 or (hasattr(b, 'isna') and b.isna()):
+                    return math.nan
+                return a / b
+            except Exception:
+                return math.nan
+
+        sr_ratio = _ratio(oos_m.get('sharpe'), is_m.get('sharpe'))
+        dr_ratio = _ratio(oos_m.get('avg_daily_return'), is_m.get('avg_daily_return'))
+        robust_ok = (
+            (0.9 <= sr_ratio <= 1.1) if sr_ratio == sr_ratio else False
+        ) and (
+            (0.9 <= dr_ratio <= 1.1) if dr_ratio == dr_ratio else False
+        )
+        print("\n=== ROBUSTNESS CHECK ===")
+        print(f"- Sharpe OOS/IS: {sr_ratio:.2f}")
+        print(f"- DailyRet OOS/IS: {dr_ratio:.2f}")
+        print(f"- Result: {'PASS' if robust_ok else 'WARN'} (target ~90% band)")
+    except Exception as e:
+        print(f"[WARN] Robustness check issue: {e}")
     
     # Cảnh báo nếu OOS "không có lệnh"
     if oos_m.get('n_trades', 0) == 0 and len(oos_daily) > 0 and abs(oos_daily).sum() < 1e-9:
@@ -368,7 +397,7 @@ def main():
             drawdown=(oos_m["max_drawdown_pct"] < 55.0),
             turnover=(0.01 < oos_m["turnover_per_day"] < 0.06),
             fitness=(oos_m["fitness"] > 2.1),
-            daily_return=(abs(oos_m["avg_daily_return"]) >= 0.0004),
+            daily_return=(oos_m["avg_daily_return"] >= 0.0004),
         ),
     )
 
