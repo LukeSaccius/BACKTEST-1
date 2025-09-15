@@ -27,15 +27,15 @@ class AggressiveRSIStrategy(bt.Strategy):
     """
 
     params = (
-        ("rsi_period", 10),  # Fast RSI
-        ("rsi_oversold", 35),  # Less restrictive
-        ("rsi_overbought", 65),  # Less restrictive
-        ("rsi_exit", 50),
+        ("rsi_period", 10),   # Fast RSI
+        ("rsi_oversold", 35), # Less restrictive
+        ("rsi_overbought", 60),
+        ("rsi_exit", 45),
         ("volume_period", 10),
-        ("min_volume_ratio", 1.1),
+        ("min_volume_ratio", 1.0),
         ("risk_per_trade", 0.03),  # 3% risk per trade
-        ("stop_loss_pct", 0.015),  # 1.5% stop loss
-        ("take_profit_pct", 0.03),  # 3% take profit
+        ("stop_loss_pct", 0.0125), # 1.25% stop loss
+        ("take_profit_pct", 0.025),# 2.5% take profit
         ("max_position_size", 0.9),
     )
 
