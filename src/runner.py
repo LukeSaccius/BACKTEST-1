@@ -341,8 +341,8 @@ def main():
         }
     
     # Print IS/OOS ranges for debugging
-    print(f"[DEBUG] IS range: {is_df['date'].min().date()} → {is_df['date'].max().date()} | rows={len(is_df)}")
-    print(f"[DEBUG] OOS range: {oos_df['date'].min().date()} → {oos_df['date'].max().date()} | rows={len(oos_df)}")
+    print(f"[DEBUG] IS range: {is_df['date'].min().date()} -> {is_df['date'].max().date()} | rows={len(is_df)}")
+    print(f"[DEBUG] OOS range: {oos_df['date'].min().date()} -> {oos_df['date'].max().date()} | rows={len(oos_df)}")
     
     is_m, is_daily = run_once(is_df, args.strategy, strategy_params, tf=args.tf, **common)
     oos_m, oos_daily = run_once(oos_df, args.strategy, strategy_params, tf=args.tf, **common)
@@ -583,3 +583,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+

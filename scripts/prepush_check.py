@@ -10,8 +10,7 @@ Exits non-zero if any command fails so git can block the push
 when used as a pre-push/pre-commit hook.
 """
 
-import subprocess as sp
-import sys
+import os, subprocess as sp, sys
 from pathlib import Path
 
 
@@ -21,6 +20,8 @@ ROOT = Path(__file__).resolve().parents[1]
 def run(cmd):
     print("\n$", " ".join(cmd))
     try:
+        env = os.environ.copy()
+        env.setdefault("PYTHONIOENCODING", "utf-8")
         res = sp.run(
             cmd,
             cwd=ROOT,
@@ -29,6 +30,7 @@ def run(cmd):
             text=True,
             encoding="utf-8",
             errors="replace",
+            env=env,
         )
         print(res.stdout)
         if res.stderr:

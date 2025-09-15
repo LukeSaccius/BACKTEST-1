@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Aggressive Profitable Strategy
 High-frequency strategy with proven profitability
@@ -496,14 +496,14 @@ def run_aggressive_backtest(
     )
 
     if is_passed and oos_passed:
-        print("🎉 EXCELLENT! Strategy shows PROFITABLE performance!")
-        print("✅ In-Sample: Exceeds all criteria")
-        print("✅ Out-of-Sample: Exceeds all criteria")
-        print("🚀 This strategy is ready for live trading!")
+        print("ðŸŽ‰ EXCELLENT! Strategy shows PROFITABLE performance!")
+        print("âœ… In-Sample: Exceeds all criteria")
+        print("âœ… Out-of-Sample: Exceeds all criteria")
+        print("ðŸš€ This strategy is ready for live trading!")
     elif is_passed:
-        print("⚠️ Strategy shows good In-Sample performance but needs OOS improvement")
+        print("âš ï¸ Strategy shows good In-Sample performance but needs OOS improvement")
     else:
-        print("❌ Strategy needs further optimization")
+        print("âŒ Strategy needs further optimization")
 
     return {
         "strategy": strategy_type,
@@ -566,3 +566,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
