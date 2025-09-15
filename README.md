@@ -82,10 +82,10 @@ python src/runner.py --csv data/VN30_1H.csv --symbol ACB --strategy sma --dtfmt 
   --sizer_perc 0.95 --walkforward --report reports/acb_p95_wf.json
 ```
 
-### Metrics & Criteria
+### Metrics & Criteria (Protocol)
 
 - Annualized Return (%), Avg Daily Return, Sharpe, Win Rate, Profit Factor, Max Drawdown (%), Turnover/day, Time-in-Market (%), Fitness
-- Pass if: Sharpe(IS>1 & OOS≥0.7), MaxDD<55%, Turnover/day 0.01–0.06, Fitness>2.1, AvgDaily≈0.0004
+- Pass if: see Metrics & Criteria (Protocol) below
 
 ### Grid Search
 
@@ -97,16 +97,50 @@ python src/runner.py --csv data/VN30_1H.csv --symbol ACB --strategy sma --dtfmt 
 
 ### Correlation
 
-Runner compares new OOS daily returns against prior `*_OOS_daily.csv` and flags correlations ≥ 0.5.
+Runner compares new OOS daily returns against prior `*_OOS_daily.csv` and flags correlations >= 0.5
 
 ### Bias Awareness
 
-- Look-ahead: OFF (next-bar execution)
-- Fees/slippage: applied
-- Beware survivorship/backfill/data-snooping
+- Look‑ahead: OFF (next‑bar execution)
+- Fees/slippage: configurable in CLI
+- Beware survivorship/backfill/data‑snooping
+
+#### Bias‑Free Protocol Checks
+- Data snooping:
+  - IS sample size ≥ 252 × number of free parameters
+  - OOS share ≥ 1/3 of total rows (runner supports `--oos_years`)
+  - Robustness: OOS/IS Sharpe and OOS/IS AvgDaily within ~90% band
+- Survivorship/backfill: Single‑symbol CSVs cannot guarantee this; for full protection use point‑in‑time universes including delisted names.
+
+#### Pass gates (default runner)
+- IS Sharpe > 1.0, OOS Sharpe ≥ 0.7
+- OOS Max Drawdown < 55%
+- OOS Turnover/day in [0.01, 0.06]
+- OOS Fitness > 2.1
+- OOS Avg Daily Return ≥ 0.0004 (~10% annualized)
+
+### Pre‑Push Backtest Check
+
+Run a quick smoke test before pushing—this script runs the aggressive RSI strategy and the generic runner, failing non‑zero on errors:
+
+```
+python scripts/prepush_check.py
+```
+
+To use it as a Git hook, add a pre‑push hook that calls the script.
+
+### Aggressive RSI Strategy (Standalone)
+
+```
+python aggressive_profitable_strategy.py --csv VN30_1H.csv --symbol VNM \
+  --strategy aggressive_rsi --cash 100000 --commission 0.001 \
+  --report reports/aggressive_vnm.json
+```
 
 ### Artifacts
 
 - **Normal Run**: JSON report, IS/OOS daily returns CSVs
 - **Grid Search**: Additional `*_grid.csv` and `*_grid.json` files
 - **All files**: Saved in `reports/` directory with clear naming
+
+
