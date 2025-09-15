@@ -84,13 +84,18 @@ class AggressiveRSIStrategy(bt.Strategy):
         else:
             current_price = self.data.close[0]
 
+            # Trail stop to lock-in gains
+            if self.stop_loss is not None:
+                trailing = current_price * (1 - self.params.stop_loss_pct)
+                self.stop_loss = max(self.stop_loss, trailing)
+
             # Check stop loss and take profit (close entire position)
             if current_price <= self.stop_loss or current_price >= self.take_profit:
                 self.order = self.close()
                 return
 
             # Check exit signals
-            if self._should_sell():
+            if self.rsi[0] > self.params.rsi_exit or self._should_sell():
                 # Close the existing long position fully
                 self.order = self.close()
 
