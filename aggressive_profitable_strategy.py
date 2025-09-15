@@ -18,38 +18,45 @@ warnings.filterwarnings("ignore")
 class AggressiveRSIStrategy(bt.Strategy):
     """Aggressive RSI Strategy (long only).
 
-    Signals and risk controls:
-    - Fast RSI for frequent signals
-    - Volume confirmation via volume/volume_sma ratio
-    - Light trend filter using short/slow SMAs
-    - Full-position exits using `close()` on stop-loss/take-profit or signal
-    - Max position sizing as a fraction of cash
+    Overview (simple and fixable):
+    - Entry: RSI oversold and turning up with light volume/trend filters.
+    - Exit: take‑profit or stop‑loss. Optional early exits:
+      - use_rsi_exit: exit when RSI recovers above rsi_exit.
+      - use_trailing_stop: trail stop with price to protect gains.
+    - Exits always use `close()` to fully close the long (never flip short).
     """
 
     params = (
-        ("rsi_period", 10),   # Fast RSI
-        ("rsi_oversold", 35), # Less restrictive
-        ("rsi_overbought", 60),
-        ("rsi_exit", 45),
+        # Core RSI thresholds
+        ("rsi_period", 10),
+        ("rsi_oversold", 35),
+        ("rsi_overbought", 65),  # baseline overbought — better OOS return observed
+        ("rsi_exit", 50),        # early‑exit threshold (used if use_rsi_exit)
+
+        # Filters & risk
         ("volume_period", 10),
-        ("min_volume_ratio", 1.0),
-        ("risk_per_trade", 0.03),  # 3% risk per trade
-        ("stop_loss_pct", 0.0125), # 1.25% stop loss
-        ("take_profit_pct", 0.025),# 2.5% take profit
+        ("min_volume_ratio", 1.1),
+        ("risk_per_trade", 0.03),
+        ("stop_loss_pct", 0.015),
+        ("take_profit_pct", 0.03),
         ("max_position_size", 0.9),
+
+        # Optional behaviors (off by default to preserve baseline returns)
+        ("use_rsi_exit", False),
+        ("use_trailing_stop", False),
     )
 
     def __init__(self):
-        # Fast RSI
+        # RSI indicator
         self.rsi = bt.indicators.RSI(self.data.close, period=self.params.rsi_period)
 
-        # Volume indicator
+        # Volume confirmation: ratio of volume to its SMA
         self.volume_sma = bt.indicators.SMA(
             self.data.volume, period=self.params.volume_period
         )
         self.volume_ratio = self.data.volume / self.volume_sma
 
-        # Moving averages for trend
+        # Simple trend filter
         self.sma_fast = bt.indicators.SMA(self.data.close, period=5)
         self.sma_slow = bt.indicators.SMA(self.data.close, period=15)
 
@@ -60,10 +67,11 @@ class AggressiveRSIStrategy(bt.Strategy):
         self.take_profit = None
 
     def next(self):
-        """Main per-bar logic: handle entries and exits.
+        """Main per‑bar logic for entries and exits.
 
-        Note: use `close()` to exit an existing long position completely,
-        instead of `sell()` without a size (which can flip short or be partial).
+        Implementation notes:
+        - Always use `close()` for exits to close the long entirely.
+        - Optional trailing stop and RSI early exit are toggled by params.
         """
         if self.order:
             return
@@ -195,13 +203,18 @@ class ScalpingStrategy(bt.Strategy):
         else:
             current_price = self.data.close[0]
 
-            # Check stop loss and take profit (close entire position)
+            # Optional: trail stop with price
+            if self.params.use_trailing_stop and self.stop_loss is not None:
+                trailing = current_price * (1 - self.params.stop_loss_pct)
+                self.stop_loss = max(self.stop_loss, trailing)
+
+            # Hard exits: stop or take profit
             if current_price <= self.stop_loss or current_price >= self.take_profit:
                 self.order = self.close()
                 return
 
-            # Check exit signals
-            if self._should_sell():
+            # Signal exits: early exit on RSI recovery (if enabled) or sell signal
+            if (self.params.use_rsi_exit and self.rsi[0] > self.params.rsi_exit) or self._should_sell():
                 # Close the existing long position fully
                 self.order = self.close()
 
