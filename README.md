@@ -72,6 +72,13 @@ python src/runner.py --csv data/VN30_1H.csv --symbol VIC --strategy rsi --grid -
   --grid_spec '{"rsi_period":[7,14],"rsi_lower":[20,30],"rsi_exit":[45,55],"sma_trend":[100,200],"use_trend_filter":[true],"stop_atr":[0,1.5],"take_atr":[0,2.0],"min_hold":[0,3]}' \
   --cash 1000000 --commission 0.0005 --dtfmt "%Y-%m-%d" --tf days \
   --report reports/vic_rsi_grid.json
+
+## Malaysian SNR + Trendline
+
+```
+python scripts/run_msnr.py --csv data/VN30_1H.csv --symbol VNM --is-years 8 --oos-years 2
+```
+Outputs daily returns CSV and a JSON report in reports/ with protocol flags and diagnostics.
 ```
 
 Walk-forward:

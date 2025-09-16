@@ -73,9 +73,9 @@ class RsiMeanRev(bt.Strategy):
                 stop_level = self.entry_price - self.p.stop_atr * self.atr[0]
                 exit_stop = self.data.close[0] <= stop_level
                 
-            # Execute exit if conditions met
+            # Execute exit if conditions met (close existing long fully)
             if can_exit and (exit_rsi or exit_upper or exit_take or exit_stop):
-                self.order = self.sell()
+                self.order = self.close()
                 
     def notify_order(self, order):
         if order.status in [order.Submitted, order.Accepted]:
@@ -88,3 +88,7 @@ class RsiMeanRev(bt.Strategy):
                 pass  # Exit completed
                 
         self.order = None
+    @property
+    def n_params(self) -> int:
+        """Number of free parameters typically varied in this strategy."""
+        return 2  # e.g., rsi_lower and rsi_exit

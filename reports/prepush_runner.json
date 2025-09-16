@@ -65,6 +65,13 @@
     "drawdown": true,
     "turnover": false,
     "fitness": false,
-    "daily_return": false
+    "daily_return": false,
+    "robustness": false
+  },
+  "robustness": {
+    "sharpe_ratio_ratio": NaN,
+    "daily_return_ratio": 0.0,
+    "passed": false,
+    "criterion": "OOS/IS within 0.9\u20131.1 for Sharpe and AvgDaily"
   }
 }

@@ -157,11 +157,14 @@ class ScalpingStrategy(bt.Strategy):
         ("rsi_period", 5),  # Very fast RSI
         ("rsi_oversold", 40),
         ("rsi_overbought", 60),
+        ("rsi_exit", 50),
         ("volume_period", 5),
         ("min_volume_ratio", 1.05),
         ("stop_loss_pct", 0.01),  # 1% stop loss
         ("take_profit_pct", 0.02),  # 2% take profit
         ("max_position_size", 0.95),
+        ("use_trailing_stop", False),
+        ("use_rsi_exit", False),
     )
 
     def __init__(self):

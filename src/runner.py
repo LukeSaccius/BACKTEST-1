@@ -11,6 +11,12 @@ Outputs compact metrics to console and writes CSV/JSON artifacts to `reports/`.
 
 import argparse, json, os, glob, hashlib
 import pandas as pd, backtrader as bt
+try:
+    from src.eval import metrics as M
+except Exception:  # allow running as script
+    import os, sys
+    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+    from eval import metrics as M
 from pathlib import Path
 
 from strategies.sma_cross import SmaCross
@@ -118,11 +124,13 @@ def run_once(df, strategy_name, strategy_params, cash, commission, slippage_bps=
     print({k: dbg.get(k) for k in ["equity_min","equity_max","equity_bad_nonpos","spike_count_abs_gt_50pct"]})
     print(f"[DEBUG] points: equity={len(equity)}, daily={len(daily)}")
 
-    # Calculate metrics from daily & equity
-    sharpe = sharpe_from_daily(daily)
-    ann = annualized_return_from_daily(daily)
-    dd_pct = max_drawdown_pct_from_equity(equity)
-    avg_daily = float(daily.mean()) if len(daily) else float("nan")
+    # Calculate metrics from DAILY equity returns
+    eq = (1.0 + daily.fillna(0.0)).cumprod()
+    clean = M.daily_equity_returns(eq)
+    sharpe = sharpe_from_daily(clean)
+    ann = annualized_return_from_daily(clean)
+    dd_pct = max_drawdown_pct_from_equity((1.0 + clean).cumprod())
+    avg_daily = float(clean.mean()) if len(clean) else float("nan")
 
     # ProfitFactor: ưu tiên từ TradeAnalyzer nếu có số liệu PnL; nếu thiếu, fallback daily
     ta = strat.analyzers.trades.get_analysis()
@@ -309,7 +317,8 @@ def main():
     p.add_argument("--slippage_bps", type=float, default=0.0)
     p.add_argument("--sizer_perc", type=float, default=0.95)
     p.add_argument("--is_years", type=int, default=8)
-    p.add_argument("--oos_years", type=int, default=3)
+    # Default OOS set to 2 years to match protocol (1–2 years)
+    p.add_argument("--oos_years", type=int, default=2)
     p.add_argument("--walkforward", action="store_true")
     p.add_argument("--grid", action="store_true")
     p.add_argument("--grid_spec", default="")
@@ -352,10 +361,20 @@ def main():
     if args.strategy == "sma":
         strategy_params = {"fast": args.fast, "slow": args.slow}
     else:  # rsi
+        # More generic defaults for multiple symbols:
+        # - Disable trend filter: mean-reversion entries often occur below trend
+        # - Slightly higher lower threshold to trigger more entries
         strategy_params = {
-            "rsi_period": 14, "rsi_lower": 30, "rsi_upper": 70, "rsi_exit": 50,
-            "sma_trend": 200, "use_trend_filter": True,
-            "atr_period": 14, "stop_atr": 0.0, "take_atr": 0.0, "min_hold": 0
+            "rsi_period": 14,
+            "rsi_lower": 35,
+            "rsi_upper": 70,
+            "rsi_exit": 50,
+            "sma_trend": 200,
+            "use_trend_filter": False,  # was True; too restrictive for many symbols
+            "atr_period": 14,
+            "stop_atr": 0.0,
+            "take_atr": 0.0,
+            "min_hold": 0,
         }
     
     # Print IS/OOS ranges for debugging
@@ -402,6 +421,11 @@ def main():
     if oos_m.get('n_trades', 0) == 0 and len(oos_daily) > 0 and abs(oos_daily).sum() < 1e-9:
         print("[WARN] OOS produced no trades or zero-return days. Check strategy filters (e.g., RSI thresholds, trend filter) and sizing.")
 
+    # Sample-size rule based on free params
+    n_params = 2 if args.strategy in {"sma","rsi"} else 2
+    is_count_days = int(len(is_df))
+    sample_size_rule_ok = bool(is_count_days >= 252 * n_params)
+
     result = dict(
         data_quality=qual,
         strategy=args.strategy,
@@ -417,6 +441,7 @@ def main():
         ),
         IS=is_m,
         OOS=oos_m,
+        sample_size=dict(required=252*n_params, actual=is_count_days, n_params=n_params, ok=sample_size_rule_ok),
         pass_criteria=dict(
             sharpe=(is_m["sharpe"] > 1.0 and oos_m["sharpe"] >= 0.7),
             drawdown=(oos_m["max_drawdown_pct"] < 55.0),
